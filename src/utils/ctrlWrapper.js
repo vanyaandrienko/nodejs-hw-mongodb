@@ -6,5 +6,5 @@ export const ctrlWrapper = (controller) => {
         next(err);
       }
     };
-};
+  };
   
