@@ -1,33 +1,27 @@
 import createHttpError from "http-errors";
+import jwt from "jsonwebtoken";
 
-import { findSession, findUser } from "../services/auth.js";
+export const authenticate = async (req, res, next) => {
+  const authorization = req.get("Authorization");
 
-export const authenticate = async(req, res, next)=> {
-    // const {authorization} = req.headers;
-    const authorization = req.get("Authorization");
-    if(!authorization) {
-        return next(createHttpError(401, "Authorization header missing"));
-    }
-    const [bearer, accessToken] = authorization.split(" ");
-    if(bearer !== "Bearer") {
-        return next(createHttpError(401, "Header must have type Bearer"));
-    }
+  if (!authorization) {
+    return next(createHttpError(401, "Authorization header missing"));
+  }
 
-    const session = await findSession({accessToken});
-    if(!session) {
-        return next(createHttpError(401, "Session not found"));
-    }
+  const [bearer, accessToken] = authorization.split(" ");
 
-    if(session.accessTokenValidUntil < Date.now()) {
-        return next(createHttpError(401, "Access token expired"));
-    }
+  if (bearer !== "Bearer") {
+    return next(createHttpError(401, "Header must have type Bearer"));
+  }
 
-    const user = await findUser({_id: session.userId});
-    if(!user) {
-        return next(createHttpError(401, "User not found"));
-    }
-
-    req.user = user;
-
+  try {
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET_ACCESS);
+    req.user = { _id: decoded.userId }; // Припускаємо, що в пейлоуді токена є userId
     next();
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return next(createHttpError(401, "Access token expired"));
+    }
+    return next(createHttpError(401, "Invalid access token"));
+  }
 };

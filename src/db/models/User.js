@@ -5,7 +5,7 @@ import { handleSaveError, setUpdateSettings } from './hooks.js';
 import { emailRegexp } from '../../constants/auth.js';
 
 const userSchema = new Schema({
-    username: {
+    name: {
         type: String,
         required: [true, "Username must be exist"],
     },
@@ -31,12 +31,27 @@ const userSchema = new Schema({
   { versionKey: false, timestamps: true }
 );
 
-userSchema.post('save', handleSaveError);
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
-userSchema.pre('findOneAndUpdate', setUpdateSettings);
+userSchema.methods.isValidPassword = async function (password) {
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (error) {
+    throw error;
+  }
+};
 
-userSchema.post('findOneAndUpdate', handleSaveError);
+const UserCollection = model('user', userSchema);
 
-const UserCollection = model("user", userSchema);
-
-export default UserCollection; 
+export default UserCollection;
