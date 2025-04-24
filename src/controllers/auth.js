@@ -12,13 +12,17 @@ const setupSession = (res, session) => {
     });
 };
 
-export const registerController = async(req, res)=> {
-    await registerUser(req.body);
+export const registerController = async (req, res) => {
+  const user = await registerUser(req.body);
 
-    res.status(201).json({
-        status: 201,
-        message: "Successfully register user",
-    });
+  
+  const { password, ...userWithoutPassword } = user.toObject();
+
+  res.status(201).json({
+    status: 201,
+    message: "Successfully registered a user!",
+    data: userWithoutPassword,
+  });
 };
 
 export const loginController = async(req, res)=> {
