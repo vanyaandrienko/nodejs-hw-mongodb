@@ -50,17 +50,12 @@ export const refreshController = async(req, res)=> {
 };
 
 export const logoutController = async(req, res)=> {
-    try {
-        if(req.cookies.sessionId) {
-            await logoutUser(req.cookies.sessionId);
-        }
-
-        res.clearCookie("sessionId");
-        res.clearCookie("refreshToken");
-
-        res.status(204).send();
-    } catch (error) {
-        console.error("Помилка в logoutController:", error); // Залогуйте помилку
-        res.status(500).json({ status: 500, message: "Помилка при виході з системи" });
+    if(req.cookies.sessionId) {
+        await logoutUser(req.cookies.sessionId);
     }
+
+    res.clearCookie("sessionId");
+    res.clearCookie("refreshToken");
+
+    res.status(204).send();
 };

@@ -7,7 +7,7 @@ import { emailRegexp } from '../../constants/auth.js';
 const userSchema = new Schema({
     name: {
         type: String,
-        required: [true, "Username must be exist"],
+        required: [true, "Name must be exist"],
     },
     email: {
         type: String,
@@ -19,39 +19,22 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-        createdAt: {
-      type: Date,
-      default: Date.now,
+    createdAt: { 
+        type: Date,
+        default: Date.now,
     },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
+    updatedAt: { 
+        type: Date,
+        default: Date.now,
     },
-  },
-  { versionKey: false, timestamps: true }
-);
+}, {versionKey: false});
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+userSchema.post('save', handleSaveError);
 
-userSchema.methods.isValidPassword = async function (password) {
-  try {
-    return await bcrypt.compare(password, this.password);
-  } catch (error) {
-    throw error;
-  }
-};
+userSchema.pre('findOneAndUpdate', setUpdateSettings);
 
-const UserCollection = model('user', userSchema);
+userSchema.post('findOneAndUpdate', handleSaveError);
+
+const UserCollection = model("user", userSchema);
 
 export default UserCollection;

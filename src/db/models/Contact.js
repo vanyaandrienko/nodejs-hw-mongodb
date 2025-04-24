@@ -24,9 +24,9 @@ const contactSchema = new Schema({
     enum: ["work", "home", "personal"],
     default: "personal",
   },
-  userId: { 
+  userId: { // Додано обов'язкове поле userId
     type: Schema.Types.ObjectId,
-    ref: 'User', 
+    ref: 'User', // Посилання на модель User
     required: true,
   },
 }, {

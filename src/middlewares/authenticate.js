@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import jwt from "jsonwebtoken";
+import { findSession, findUser } from "../services/auth.js";
 
 export const authenticate = async (req, res, next) => {
   const authorization = req.get("Authorization");
@@ -10,18 +10,29 @@ export const authenticate = async (req, res, next) => {
 
   const [bearer, accessToken] = authorization.split(" ");
 
-  if (bearer !== "Bearer") {
-    return next(createHttpError(401, "Header must have type Bearer"));
+  if (bearer !== "Bearer" || !accessToken) { // Додано перевірку наявності accessToken
+    return next(createHttpError(401, "Invalid authorization format. Expected 'Bearer <token>'"));
   }
 
-  try {
-    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET_ACCESS);
-    req.user = { _id: decoded.userId }; // Припускаємо, що в пейлоуді токена є userId
-    next();
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
+  try { // Обернено асинхронні операції в try-catch
+    const session = await findSession({ accessToken });
+    if (!session) {
+      return next(createHttpError(401, "Invalid access token")); // Змінено повідомлення
+    }
+
+    if (session.accessTokenValidUntil < Date.now()) {
       return next(createHttpError(401, "Access token expired"));
     }
-    return next(createHttpError(401, "Invalid access token"));
+
+    const user = await findUser({ _id: session.userId });
+    if (!user) {
+      return next(createHttpError(401, "User associated with this token not found")); // Змінено повідомлення
+    }
+
+    req.user = user;
+    next();
+
+  } catch (error) {
+    next(error); // Обробка помилок findSession та findUser
   }
 };

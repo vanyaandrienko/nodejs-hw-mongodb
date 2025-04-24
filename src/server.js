@@ -1,43 +1,44 @@
 import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
+
 import { getEnvVar } from './utils/getEnvVar.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
-import router from './routers/contacts.js';
-import authRouter from './routers/auth.js';
+import authRouter from './routers/auth.js'
+import  router  from './routers/contacts.js';
 
-export function setupServer() {
-    const app = express(); // Оголошуємо 'app' на самому початку
+export function setupServer() {      
+
     const PORT = Number(getEnvVar('PORT', '3000'));
 
-    app.use(cookieParser()); // Тепер 'app' вже ініціалізовано
-    app.use(express.json());
+    const app = express();
 
+    app.use(express.json());
+    
     app.use(
         pino({
-            transport: {
-                target: 'pino-pretty',
-            },
+          transport: {
+            target: 'pino-pretty',
+          },
         }),
-    );
+      );
 
     app.use(cors());
 
     app.get('/', (req, res) => {
-        res.json({
-            message: 'Hello World!',
-        });
+      res.json({
+        message: 'Hello World!',
+      });
     });
-
-    app.use(router);
-    app.use("/auth", authRouter);
+    app.use('/auth', authRouter);
+    app.use(router); 
+   
     app.use('*', notFoundHandler);
 
     app.use(errorHandler);
-
+  
     app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
     });
 };
