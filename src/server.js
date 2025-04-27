@@ -31,8 +31,8 @@ export function setupServer() {
     });
   });
 
-  app.use("/api/contacts", contactsRouter);
-  app.use("/api/auth", authRouter);
+  app.use("/contacts", contactsRouter);
+  app.use("/auth", authRouter);
 
   app.use('*', notFoundHandler);
 
@@ -41,4 +41,4 @@ export function setupServer() {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-}
+};
