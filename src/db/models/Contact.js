@@ -3,8 +3,7 @@ import { Schema, model } from "mongoose";
 const contactSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: "user",      // це посилання на модель юзера
-        required: true,
+        ref: "user",      
     },
     name: {
         type: String,
