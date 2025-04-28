@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 
 const contactSchema = new Schema({
+    
     name: {
         type: String,
         required: true,
@@ -23,6 +24,11 @@ const contactSchema = new Schema({
         required: true,
         enum: [ "work", "home", "personal" ],
         default: "personal",
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "user",      
+        required: true,
     },
 }, {
     timestamps: true,

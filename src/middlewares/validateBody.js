@@ -6,8 +6,7 @@ export const validateBody = (schema) => async (req, res, next) => {
       abortEarly: false,
     });
     next();
-  } catch (err) {
-    const errorMessages = err.details.map(e => e.message);
-    next(createHttpError(400, `Validation Error`, { errors: errorMessages }));
+  } catch (error) {
+    next(createHttpError(400, error.message));
   }
 };
