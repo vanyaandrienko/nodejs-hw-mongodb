@@ -1,6 +1,11 @@
 import { Schema, model } from "mongoose";
 
 const contactSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "user",      // це посилання на модель юзера
+        required: true,
+    },
     name: {
         type: String,
         required: true,
@@ -15,13 +20,11 @@ const contactSchema = new Schema({
     },
     isFavourite: {
         type: Boolean,
-        required: false,
         default: false,
     },
     contactType: {
         type: String,
-        required: true,
-        enum: [ "work", "home", "personal" ],
+        enum: ["work", "home", "personal"],
         default: "personal",
     },
 }, {
