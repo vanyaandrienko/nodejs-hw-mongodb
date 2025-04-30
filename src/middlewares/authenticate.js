@@ -4,8 +4,9 @@ import { findSession, findUser } from "../services/auth.js";
 
 export const authenticate = async (request, response, next) => {
     const authorization = request.get("Authorization");
+
     if (!authorization) {
-        return next(createHttpError(401, "Authorization header missing"));
+        return next(createHttpError(401, "Authorization header missing"))
     }
     const [bearer, accessToken] = authorization.split(' ');
     if (bearer !== "Bearer") {
@@ -13,7 +14,9 @@ export const authenticate = async (request, response, next) => {
     }
 
     const session = await findSession({ accessToken });
+
     if (!session) {
+
         return next(createHttpError(401, "Session not found"));
     }
 
@@ -30,4 +33,4 @@ export const authenticate = async (request, response, next) => {
     request.user = user;
 
     next();
-};
+}

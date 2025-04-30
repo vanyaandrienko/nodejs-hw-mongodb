@@ -1,7 +1,8 @@
 import { Schema, model } from "mongoose";
 
+import { typeList } from "../../constants/contacts.js";
+
 const contactSchema = new Schema({
-    
     name: {
         type: String,
         required: true,
@@ -12,28 +13,42 @@ const contactSchema = new Schema({
     },
     email: {
         type: String,
-        required: false,
     },
     isFavourite: {
         type: Boolean,
-        required: false,
         default: false,
+        required: true,
     },
     contactType: {
         type: String,
+        enum: typeList,
         required: true,
-        enum: [ "work", "home", "personal" ],
         default: "personal",
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: "user",      
+        ref: "user",
         required: true,
     },
-}, {
-    timestamps: true,
-    versionKey: false,
-});
+    photo: {
+        type: String,
+        required: false,
+        default: null,
+    },
+},
+    {
+        versionKey: false,
+        timestamps: true,
+    },
+);
 
-const ContactCollection = model("contacts", contactSchema);
+contactSchema.post("save", (error, doc, next) => {
+    next();
+})
+
+export const contactSortFields = ["name", "phoneNumber", "email",
+    "isFavourite", "contactType"]
+
+const ContactCollection = model("contact", contactSchema);
+
 export default ContactCollection;
