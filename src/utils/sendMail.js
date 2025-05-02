@@ -1,11 +1,13 @@
 import nodemailer from "nodemailer";
+
 import { SMTP } from "../constants/index.js";
 import { getEnvVar } from "./getEnvVar.js";
-
+console.log("SMTP PORT:", getEnvVar(SMTP.SMTP_PORT));
+console.log("Secure:", false);
 const transporter = nodemailer.createTransport({
-  host: getEnvVar(SMTP.SMTP_HOST),
-  port: Number(getEnvVar(SMTP.SMTP_PORT)),
-  secure: false,
+    host: getEnvVar(SMTP.SMTP_HOST),
+    port: Number(getEnvVar(SMTP.SMTP_PORT)),
+    secure: false, // ✅ ОБОВ’ЯЗКОВО!
   auth: {
     user: getEnvVar(SMTP.SMTP_USER),
     pass: getEnvVar(SMTP.SMTP_PASSWORD),
@@ -16,12 +18,5 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendEmail = async (options) => {
-  try {
-    const result = await transporter.sendMail(options);
-    console.log("✅ Email sent:", result);
-    return result;
-  } catch (err) {
-    console.error("❌ Send error:", err); // <-- ось це побачиш у терміналі
-    throw err; // дозволяє контролеру обробити помилку (через createHttpError)
-  }
+    return await transporter.sendMail(options);
 };

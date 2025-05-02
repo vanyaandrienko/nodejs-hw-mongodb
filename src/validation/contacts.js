@@ -1,4 +1,3 @@
-
 import Joi from "joi";
 
 import { typeList } from "../constants/contacts.js";
