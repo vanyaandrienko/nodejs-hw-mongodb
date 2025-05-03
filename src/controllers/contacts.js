@@ -121,4 +121,4 @@ export const deleteContactController = async (request, response) => {
     }
 
     response.status(204).send();
-};
+}
