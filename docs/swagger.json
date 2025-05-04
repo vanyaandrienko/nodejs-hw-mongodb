@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://nodejs-hw-mongodb-5-sbgb.onrender.com"
+      "url": "https://nodejs-hw-mongodb-5-amhp.onrender.com "
     },
     {
       "url": "http://localhost:3000"
